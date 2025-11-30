@@ -10,7 +10,7 @@
 
 This repository provides a proof-of-concept implementation of the Tate and ate pairings for the BLS12-381 curve. These implementations are for demonstration purposes only and not intended for use as a cryptographic library.
 
-This function specifications and API are fully documented in the source headers (`.h` files).  
+Function specifications and API are fully documented in the source headers (`.h` files).  
 Each function includes a comment block describing:
 
 - Purpose
