@@ -62,23 +62,6 @@ void Fq12_mont_rep_inv(Fq12* a, Fq12* aR)
 	Fq6_mont_rep_inv(&(a->val1), &(aR->val1));
 }
 
-/*
-// comparison
-int Fq12_cmp(Fq12* a, Fq12* b)
-{
-	int cmp0, cmp1;
-	cmp0 = Fq6_cmp(&(a->val0), &(b->val0));
-	cmp1 = Fq6_cmp(&(a->val1), &(b->val1));
-
-	if (cmp0 == 0 && cmp1 == 0)
-	{
-		return 0;
-	}
-
-	return 1;
-}
-*/
-
 uint32_t Fq12_cmp(Fq12* a, Fq12* b)
 {
 	return Fq6_cmp(&(a->val0), &(b->val0)) & Fq6_cmp(&(a->val1), &(b->val1));
