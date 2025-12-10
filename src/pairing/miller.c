@@ -177,10 +177,6 @@ void ate_line_adding(Fq12* rop, G2_Z* RZ, G2_Z* QZ, G1* P) // L_R,Q (P)
 	Fq2_mont_mul(&c1, &c1, &P2y);
 	Fq2_mont_mul(&c2, &c2, &P2x);
 
-	//Fq2_mont_mul(&c1, &c1, &sextic_const); //<--- not needed due to Frobenius E.
-	//Fq2_mont_mul(&c2, &c2, &sextic_const); 
-	//Fq2_mont_mul(&c3, &c3, &sextic_const);
-
 	// untwisting
 	Fq2 zero2;
 	Fq2_set_ui(&zero2, 0, 0);
