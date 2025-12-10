@@ -62,24 +62,7 @@ void Fq_assign(Fq* rop, Fq* a)
 		rop->limbs[i] = a->limbs[i];
 	}
 }
-/*
-void Fq_correction(Fq* a) //if a==q, make a = 0; otherwise, leave untouched
-{
-	uint32_t mask = 1;
-	
-	for(int i = 0; i < N_LIMBS; i++)
-	{
-		mask = mask & (a->limbs[i] == Q_MODULUS.limbs[i]);
-	}
-	
-	mask = -mask;
-	
-	for(int i = 0; i < N_LIMBS; i++)
-	{
-		a->limbs[i] = (a->limbs[i] & ~mask);
-	}
-}
-*/
+
 uint8_t Fq_hex_to_nibble (char c)
 {
 	uint8_t result  = 0;
