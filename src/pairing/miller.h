@@ -7,6 +7,8 @@
  * void ate_pairing(Fq12* rop, G1* P, G2_Z* Q) - compute the ate pairing of points
  *      P and Q using Miller's algorithm and store the result in rop.
  *
+ * All inputs must be put in Montgomery form.
+ *
  * ===CONTENTS==================================================================
  *
  * -- Variable and Struct Descriptions -----------------------------------------
@@ -16,13 +18,14 @@
  *
  * struct G12_Z - same, projective space
  *
- * char* bPOW_STR - a string containting the binary representation of 
- *      (q^6 + 1)/r.
+ * char* bX_STR, bXP1_STR, bXP1_DIV3_STR - strings used for the final exponentiation. 
  *
- * int len_bPOW_STR - the length of bPOW_STR;
+ * int len_bX_STR, len_bXP1_STR, len_bXP1_DIV3_STR - their lengths.
+ *
+ * Fq2 gij - constants for Frobenius endomorphism.
  *
  * char* bATE_STR - a string containing the binary representation of 
- *      the curve parameter x.
+ *      the curve parameter x. Used for Miller's loop.
  *
  * int len_bATE_STr - its length.
  *
@@ -30,7 +33,7 @@
  *
  * Initialisation functions
  * ---------------
- * void exp_precompute() - set bPOW_STR and len_bPOW_STR.
+ * void exp_precompute() - set parameters for the final exponentiation.
  * void ate_precompute() - set bATE_STR and len_bATE_STR.
  *
  * Ate pairing
@@ -47,10 +50,14 @@
  *      P and Q prior to the final exponentiation and store the result in rop. 
  *      This is a helper function.
  *
+ * void ate_exp_x<...>(Fq12* rop, Fq12* a) - family of functions setting rop to a^f(x).
+ *
+ * void ate_exp_qj(Fq12* rop, Fq12* a) - family of functions setting rop to a^(q^j)
+ *
+ * void ate_exp_hard(Fq12* rop, Fq12* a) - set rop to a^((q^6 + 1)/r).
+ *
  * void ate_exp(Fq12* rop, Fq12* a) - compute t to the power (q^12 - 1)/r and
- *      store the result in rop. We optimize exponentiation, since (q^12 - 1)/r =
- *      = (q^6 - 1) * (q^6 + 1)/r, and raising to the power (q^6 - 1) is easy.
- *      This is a helper function.
+ *      store the result in rop.
  *
  * void ate_pairing(Fq12* rop, G1* P, G2_Z* QZ) - compute the ate pairing of points
  *      P and Q using Miller's algorithm and store the result in rop.
@@ -81,11 +88,21 @@
 #include <stdlib.h>
 #include <string.h>
 
-extern char* bPOW_STR;
-extern int len_bPOW_STR;
-
 extern char* bATE_STR;
 extern int len_bATE_STR;
+
+extern Fq2 g11, g12, g13, g14, g15;
+extern Fq2 g21, g22, g23, g24, g25;
+
+extern char* bX_STR;
+extern char* bX2_STR;
+extern char* bXP1_STR;
+extern char* bXP1_DIV3_STR;
+
+extern int len_bX_STR;
+extern int len_bX2_STR;
+extern int len_bXP1_STR;
+extern int len_bXP1_DIV3_STR;
 
 // init
 void exp_precompute();

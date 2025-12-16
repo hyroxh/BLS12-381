@@ -34,7 +34,6 @@
 #include "../src/pairing/miller.h"
 #include <stdio.h>
 
-
 //-------------Ate pairing
 
 void ate_pairing_mul(Fq12* rop, Fr* a, Fr* b)
@@ -104,10 +103,10 @@ int main(void)
 	
 	//----Test1
 
-	Fr_set_hex_str(&a, "1aaaaaaaaaaffffffffbb");
-	Fr_set_hex_str(&b, "12345ccccddd");
+	Fr_set_hex_str(&a, "1aaaaaaaaaaffffffffbf");
+	Fr_set_hex_str(&b, "12345ccccddf");
 	
-	if(ate_test(&a, &b, 0) == 1)
+	if(ate_test(&a, &b, 1) == 1)
 	{
 		printf("Test 1:\tSuccess!\n");
 		printf("----------\n");

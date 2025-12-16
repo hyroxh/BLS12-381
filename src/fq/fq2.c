@@ -60,6 +60,14 @@ void Fq2_mont_rep_inv(Fq2* a, Fq2* aR)
 	Fq_mont_rep_inv(&(a->val1), &(aR->val1));
 }
 
+//Conjugation
+void Fq2_conj(Fq2* rop, Fq2* a)
+{
+	Fq_assign(&(rop->val0), &(a->val0));
+	Fq_add_inv(&(rop->val1), &(a->val1));
+}
+
+
 
 
 // Print

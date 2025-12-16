@@ -10,46 +10,81 @@
 #include <stdlib.h>
 #include <string.h>
 
-char* bPOW_STR;
-
-int len_bPOW_STR;
-
 char* bATE_STR;
 
 int len_bATE_STR;
 
+Fq2 g11, g12, g13, g14, g15;
+Fq2 g21, g22, g23, g24, g25;
+
+char* bX_STR;
+char* bX2_STR;
+char* bXP1_STR;
+char* bXP1_DIV3_STR;
+
+int len_bX_STR;
+int len_bX2_STR;
+int len_bXP1_STR;
+int len_bXP1_DIV3_STR;
+
 void exp_precompute()
-{
-	bPOW_STR = "10100010110011000101001000011101110101000000110111101101101"
-	"1110010001101011100010101011100101001110101011001101101101111111000010"
-	"1101011100110011001001100111101011011101100110110010101111001101011101"
-	"0101000001111000100100011000001110110101110000011101100100100000011000"
-	"1000101111001101111011110110011001010110101110011011101011010001101110"
-	"1100011101111011111011111001100111101010110111110110001010101110011101"
-	"1111010101010100011000101010010001100111000001000000010011011110001011"
-	"1110110000110101111101101000110111000011001011110111101001011111010010"
-	"0100010011001111100001100010100000001001001101100100000000010111011101"
-	"1001000010110100010111001110000011111110000100001000001100001010101010"
-	"0011101000100010010010111111110001011001011110010100100100010100101100"
-	"1111000011110001111111010111100101110010101110100011111000100110000010"
-	"0001001110101111011110100100110011101111111111011000100101101011010101"
-	"0000111010011010010000110110111001111011010001010111000001000101111010"
-	"1000101001010100111000100111101101111111011100110101010010101110110110"
-	"0010001111001100011111101010110010111101000100001101100100101001100010"
-	"0111110000010001110000100110000111011010111100010111101010101011111000"
-	"0001011000101011111001001111101011110111101100100001001001101010000001"
-	"0000111000011111100000000011111000000000111100111111010111110001110101"
-	"1111100100000010110000100000001110111011101000001110110000100010111110"
-	"1000111010110000101011101010010011110001001110110010011010111101111000"
-	"0111011010111101111010010110001100010001010001000001011000000111000111"
-	"0111000011100110101000111011110001110000011011110011100110011100000100"
-	"1011001110000100010101000010010101111010100000000100010010001110100000"
-	"1101100110110111111101100011101110110000000101101011100100111000101010"
-	"1100011100010010000111100010011001100111010000010011100010001001001011"
-	"1100100000011111101110110111010011100111100001111011100001010011000011"
-	"1000111100100011110001000001001101001010010010101101101111000000011100"
-	"000011010000101101000011100111001111000011100110111000000011100000101110101101010"; //(q^6 + 1)/r
-	len_bPOW_STR = 2030;
+{	
+	bX_STR = "1101001000000001000000000000000000000000000000010000000000000000"; // |x|
+	bXP1_STR = "1101001000000001000000000000000000000000000000010000000000000001";// |x| + 1
+	bXP1_DIV3_STR = "100011000000000010101010101010101010101010101011010101010101011"; // (1 + |x|)/3
+	bX2_STR = "10101100010001011010010000000001000000000000000110100100000000100000000000000000000000000000000100000000000000000000000000000000"; //x^2
+	
+	len_bX_STR = 64;
+	len_bXP1_STR = 64;
+	len_bXP1_DIV3_STR = 63;
+	len_bX2_STR = 128;
+	
+	/*
+	
+	If f = h + gw, then f = g0 + h0 * w + g1 * w^2 + h1 * w^3 + g2 * w^4 + h2 * w^5.
+	
+	f^q = ~g0 + ~h0 * g11 * w + ~g1 * g12 *  w^2 + ~h1 * g13 * w^3 + ~g2 * g14 * w^4 + ~h2 * g15 * w^5, where ~a is conjugation of a.
+	
+	f^(q^2) = f = g0 + h0 * g21 * w + g1 * g22 * w^2 + h1 * g23 * w^3 + g2 * g24 * w^4 + h2 * g25 * w^5.
+	
+	Coefficients g11, ..., g15, g21, ..., g25 are given below. 
+	
+	Notice that g2j = g1j * ~g1j.	
+	
+	*/
+	
+	Fq2_set_hex_str(&g11, "1904d3bf02bb0667c231beb4202c0d1f0fd603fd3cbd5f4f7b2443d784bab9c4f67ea53d63e7813d8d0775ed92235fb8",
+	"fc3e2b36c4e03288e9e902231f9fb854a14787b6c7b36fec0c8ec971f63c5f282d5ac14d6c7ec22cf78a126ddc4af3");
+	
+	Fq2_set_hex_str(&g12, "0", "1a0111ea397fe699ec02408663d4de85aa0d857d89759ad4897d29650fb85f9b409427eb4f49fffd8bfd00000000aaac");
+	
+	Fq2_set_hex_str(&g13, "6af0e0437ff400b6831e36d6bd17ffe48395dabc2d3435e77f76e17009241c5ee67992f72ec05f4c81084fbede3cc09",
+	"6af0e0437ff400b6831e36d6bd17ffe48395dabc2d3435e77f76e17009241c5ee67992f72ec05f4c81084fbede3cc09");
+	
+	Fq2_set_hex_str(&g14, "1a0111ea397fe699ec02408663d4de85aa0d857d89759ad4897d29650fb85f9b409427eb4f49fffd8bfd00000000aaad", "0");
+	
+	Fq2_set_hex_str(&g15,  "5b2cfd9013a5fd8df47fa6b48b1e045f39816240c0b8fee8beadf4d8e9c0566c63a3e6e257f87329b18fae980078116",
+	"144e4211384586c16bd3ad4afa99cc9170df3560e77982d0db45f3536814f0bd5871c1908bd478cd1ee605167ff82995");
+	
+	Fq2_set_hex_str(&g21, "5f19672fdf76ce51ba69c6076a0f77eaddb3a93be6f89688de17d813620a00022e01fffffffeffff", "0");
+	Fq2_set_hex_str(&g22, "5f19672fdf76ce51ba69c6076a0f77eaddb3a93be6f89688de17d813620a00022e01fffffffefffe", "0");
+	Fq2_set_hex_str(&g23, "1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaaa", "0");
+	Fq2_set_hex_str(&g24, "1a0111ea397fe699ec02408663d4de85aa0d857d89759ad4897d29650fb85f9b409427eb4f49fffd8bfd00000000aaac", "0");
+	Fq2_set_hex_str(&g25, "1a0111ea397fe699ec02408663d4de85aa0d857d89759ad4897d29650fb85f9b409427eb4f49fffd8bfd00000000aaad", "0");
+	
+	//Mont representation
+	Fq2_mont_rep(&g11, &g11);
+	Fq2_mont_rep(&g12, &g12);
+	Fq2_mont_rep(&g13, &g13);
+	Fq2_mont_rep(&g14, &g14);
+	Fq2_mont_rep(&g15, &g15);
+	
+	Fq2_mont_rep(&g21, &g21);
+	Fq2_mont_rep(&g22, &g22);
+	Fq2_mont_rep(&g23, &g23);
+	Fq2_mont_rep(&g24, &g24);
+	Fq2_mont_rep(&g25, &g25);
+	
 }
 
 void ate_precompute()
@@ -239,33 +274,212 @@ void ate(Fq12* rop, G1* P, G2_Z* QZ) // pre-exponent execution
 										//(This case, the rest is guaranteed to be 0).
 }
 
-void ate_exp(Fq12* rop, Fq12* a)
+void ate_exp_q(Fq12* rop, Fq12* a) //rop = a^q
 {
-	Fq6 val0, val1;
+	/*
+	
+	f^q = ~g0 + ~h0 * g11 * w + ~g1 * g12 *  w^2 + ~h1 * g13 * w^3 + ~g2 * g14 * w^4 + ~h2 * g15 * w^5
+	
+	*/
+	
+	Fq2 g0, g1, g2, h0, h1, h2;
+	Fq2_assign(&g0, &(a->val0.val0));
+	Fq2_assign(&g1, &(a->val0.val1));
+	Fq2_assign(&g2, &(a->val0.val2));
+	Fq2_assign(&h0, &(a->val1.val0));
+	Fq2_assign(&h1, &(a->val1.val1));
+	Fq2_assign(&h2, &(a->val1.val2));
+	
+	Fq2_conj(&g0, &g0);
+	Fq2_conj(&g1, &g1);
+	Fq2_conj(&g2, &g2);
+	Fq2_conj(&h0, &h0);
+	Fq2_conj(&h1, &h1);
+	Fq2_conj(&h2, &h2);
+	
+	Fq2_mont_mul(&g1, &g1, &g12);
+	Fq2_mont_mul(&g2, &g2, &g14);
+	Fq2_mont_mul(&h0, &h0, &g11);
+	Fq2_mont_mul(&h1, &h1, &g13);
+	Fq2_mont_mul(&h2, &h2, &g15);
+	
+	Fq2_assign(&(rop->val0.val0), &g0);
+	Fq2_assign(&(rop->val0.val1), &g1);
+	Fq2_assign(&(rop->val0.val2), &g2);
+	Fq2_assign(&(rop->val1.val0), &h0);
+	Fq2_assign(&(rop->val1.val1), &h1);
+	Fq2_assign(&(rop->val1.val2), &h2);
+	
+}
 
-	Fq12 temp, inv, aux;
+void ate_exp_q2(Fq12* rop, Fq12* a) //rop = a^(q^2).
+{
+	/*
+	
+	f^(q^2) = f = g0 + h0 * g21 * w + g1 * g22 * w^2 + h1 * g23 * w^3 + g2 * g24 * w^4 + h2 * g25 * w^5.
+	
+	*/
+	Fq2 g0, g1, g2, h0, h1, h2;
+	Fq2_assign(&g0, &(a->val0.val0));
+	Fq2_assign(&g1, &(a->val0.val1));
+	Fq2_assign(&g2, &(a->val0.val2));
+	Fq2_assign(&h0, &(a->val1.val0));
+	Fq2_assign(&h1, &(a->val1.val1));
+	Fq2_assign(&h2, &(a->val1.val2));
+	
+	Fq2_mont_mul(&g1, &g1, &g22);
+	Fq2_mont_mul(&g2, &g2, &g24);
+	Fq2_mont_mul(&h0, &h0, &g21);
+	Fq2_mont_mul(&h1, &h1, &g23);
+	Fq2_mont_mul(&h2, &h2, &g25);
+	
+	Fq2_assign(&(rop->val0.val0), &g0);
+	Fq2_assign(&(rop->val0.val1), &g1);
+	Fq2_assign(&(rop->val0.val2), &g2);
+	Fq2_assign(&(rop->val1.val0), &h0);
+	Fq2_assign(&(rop->val1.val1), &h1);
+	Fq2_assign(&(rop->val1.val2), &h2);
+}
 
-	Fq6_assign(&val0, &(a->val0));
-	Fq6_assign(&val1, &(a->val1));
-	Fq6_add_inv(&val1, &val1);
-	Fq12_mont_mul_inv(&inv, a);
+void ate_exp_q6(Fq12* rop, Fq12* a) //rop = a^(q^6)
+{
+	/*
+	
+	f = g + hw
+	
+	f^(q^6) = g - hw
+	
+	*/
+	
+	Fq6 g, h;
+	Fq6_assign(&g, &(a->val0));
+	Fq6_assign(&h, &(a->val1));
+	
+	Fq6_add_inv(&h, &h);
+	
+	Fq6_assign(&(rop->val0), &g);
+	Fq6_assign(&(rop->val1), &h);
+}
 
-	Fq12_set(&temp, &val0, &val1);
-	Fq12_mont_mul(&temp, &temp, &inv);
-
-	Fq12_assign(&aux, &temp);
-
-	for (int i = 1; i < len_bPOW_STR; i++)
+void ate_exp_x(Fq12* rop, Fq12* a) // rop = a ^ x
+{
+	Fq12 aux;
+	Fq12_assign(&aux, a);
+	
+	for(int i = 1; i < len_bX_STR; i++)
 	{
 		Fq12_mont_mul(&aux, &aux, &aux);
-		if (bPOW_STR[i] == '1')
+		if(bX_STR[i] == '1')
 		{
-			Fq12_mont_mul(&aux, &aux, &temp);
+			Fq12_mont_mul(&aux, &aux, a);
 		}
 	}
 	
-	//Fq12_mont_mul_inv(&aux, &aux);
 	Fq12_assign(rop, &aux);
+}
+
+void ate_exp_xp1(Fq12* rop, Fq12* a) // rop = a ^ (x+1)
+{
+	Fq12 aux;
+	Fq12_assign(&aux, a);
+	
+	for(int i = 1; i < len_bXP1_STR; i++)
+	{
+		Fq12_mont_mul(&aux, &aux, &aux);
+		if(bXP1_STR[i] == '1')
+		{
+			Fq12_mont_mul(&aux, &aux, a);
+		}
+	}
+	
+	Fq12_assign(rop, &aux);
+}
+
+void ate_exp_xp1div3(Fq12* rop, Fq12* a) // rop = a ^ (x+1)/3
+{
+	Fq12 aux;
+	Fq12_assign(&aux, a);
+	
+	for(int i = 1; i < len_bXP1_DIV3_STR; i++)
+	{
+		Fq12_mont_mul(&aux, &aux, &aux);
+		if(bXP1_DIV3_STR[i] == '1')
+		{
+			Fq12_mont_mul(&aux, &aux, a);
+		}
+	}
+	
+	Fq12_assign(rop, &aux);
+}
+
+void ate_exp_hard(Fq12* rop, Fq12* f) //rop = f^((q^4 - q^2 + 1)/r)
+{
+	/*
+	
+	Note the following identity.
+	
+	(q^4 - q^2 + 1)/r = (x+1)^2 /3 * (q-x)(x^2 + q^2 - 1) + 1, where x = 0xd201000000010000 (x is taken positive here).
+	
+	Also, f^(-1) = ~f, because of the consequent raising to the power (q^6-1).
+	
+	*/
+	
+	Fq12 a, b1, b2, b, c1, c2, c3, c; //auxiliary variables
+	
+	// I. powering to (x+1)^2/3
+	
+	ate_exp_xp1div3(&a, f);
+	ate_exp_xp1(&a, &a);
+	
+	// II. powering to q - x
+	
+	ate_exp_q(&b1, &a);
+	
+	Fq12_conj(&b2, &a);
+	ate_exp_x(&b2, &b2); //b2 = a^(-x).
+	Fq12_mont_mul(&b, &b1, &b2);
+	
+	// III. powering to x^2 + q^2 - 1
+	
+	ate_exp_x(&c1, &b);
+	ate_exp_x(&c1, &c1);
+	
+	ate_exp_q2(&c2, &b);
+	
+	Fq12_conj(&c3, &b);
+	
+	Fq12_mont_mul(&c, &c1, &c2);
+	Fq12_mont_mul(&c, &c, &c3);
+	
+	// IV. multiplying by f and returning the result
+	
+	Fq12_mont_mul(rop, &c, f);
+}
+
+void ate_exp(Fq12* rop, Fq12* a)
+{	
+	Fq12 aux1, aux2, inv2;
+	
+	// Computing a^(q^2 + 1)
+	
+	Fq12_assign(&aux1, a);
+	
+	ate_exp_q2(&aux1, &aux1);
+	Fq12_mont_mul(&aux1, &aux1, a);
+	
+	// Computing (a^(q^2 + 1)) ^ (q^6 - 1)
+	
+	Fq12_assign(&aux2, &aux1);
+	Fq12_mont_mul_inv(&inv2, &aux2);
+	
+	ate_exp_q6(&aux2, &aux2);
+	Fq12_mont_mul(&aux2, &aux2, &inv2); 
+	
+	// Powering to the (q^4 - q^2 + 1)/r
+	
+	Fq12 result;
+	Fq12_assign(&result, &aux2);
+	ate_exp_hard(rop, &result);
 }
 
 void ate_pairing(Fq12* rop, G1* P, G2_Z* QZ)

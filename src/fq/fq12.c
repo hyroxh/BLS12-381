@@ -62,6 +62,13 @@ void Fq12_mont_rep_inv(Fq12* a, Fq12* aR)
 	Fq6_mont_rep_inv(&(a->val1), &(aR->val1));
 }
 
+//Conjugation
+void Fq12_conj(Fq12* rop, Fq12* a)
+{
+	Fq6_assign(&(rop->val0), &(a->val0));
+	Fq6_add_inv(&(rop->val1), &(a->val1));
+}
+
 uint32_t Fq12_cmp(Fq12* a, Fq12* b)
 {
 	return Fq6_cmp(&(a->val0), &(b->val0)) & Fq6_cmp(&(a->val1), &(b->val1));

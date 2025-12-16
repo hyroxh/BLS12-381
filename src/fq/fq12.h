@@ -34,6 +34,9 @@ void Fq2_to_Fq12(Fq12* rop, Fq2* a);
 void Fq12_mont_rep(Fq12* aR, Fq12* a);
 void Fq12_mont_rep_inv(Fq12* a, Fq12* aR);
 
+//Conjugation
+void Fq12_conj(Fq12* rop, Fq12* a);
+
 // comparison
 uint32_t Fq12_cmp(Fq12* a, Fq12* b); // if a=b, return 1; otherwise, return 0
 

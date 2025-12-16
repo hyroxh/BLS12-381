@@ -33,6 +33,9 @@ uint32_t Fq2_cmp(Fq2* a, Fq2* b); // NB! return 0, if a==b; returns 1, otherwise
 void Fq2_mont_rep(Fq2* aR, Fq2* a);
 void Fq2_mont_rep_inv(Fq2* a, Fq2* aR);
 
+//Conjugation
+void Fq2_conj(Fq2* rop, Fq2* a);
+
 // Arithmetic
 static inline void Fq2_add(Fq2* rop, Fq2* a, Fq2* b)
 {
